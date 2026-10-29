@@ -1,0 +1,243 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "System user account with role-based access control.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Unique identifier of the user matching Firebase Auth UID."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Email address of the user."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the user."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "view_only"],
+          "description": "Assigned system role (admin has full access, view_only can only view)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the user account was registered."
+        }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Catalog item in the inventory. Stock count can only be modified through invoice transactions.",
+      "type": "object",
+      "properties": {
+        "sku": {
+          "type": "string",
+          "description": "Stock Keeping Unit unique code."
+        },
+        "name": {
+          "type": "string",
+          "description": "Product display name."
+        },
+        "category": {
+          "type": "string",
+          "description": "Product category classification."
+        },
+        "unit": {
+          "type": "string",
+          "description": "Unit of measurement (e.g. Units, Kg, Boxes)."
+        },
+        "unitPrice": {
+          "type": "number",
+          "description": "Standard unit cost or valuation."
+        },
+        "minStockThreshold": {
+          "type": "number",
+          "description": "Minimum inventory threshold that triggers low-stock alerts."
+        },
+        "currentStock": {
+          "type": "number",
+          "description": "Current quantity in storage, updated strictly through transactions."
+        },
+        "location": {
+          "type": "string",
+          "description": "Storage warehouse location or bin identifier."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp."
+        }
+      },
+      "required": ["sku", "name", "category", "unitPrice", "minStockThreshold", "currentStock"]
+    },
+    "Invoice": {
+      "title": "Invoice",
+      "description": "Formal stock modification record for either receipt (import) or dispatch (export).",
+      "type": "object",
+      "properties": {
+        "invoiceNumber": {
+          "type": "string",
+          "description": "Formal sequential invoice number (e.g. INV-IMP-001)."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["import", "export"],
+          "description": "Invoice type: import adds to inventory, export removes from inventory."
+        },
+        "referenceNumber": {
+          "type": "string",
+          "description": "External reference number (e.g. PO, DO, or Shipping Bill)."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["completed", "draft", "cancelled"],
+          "description": "Status of the invoice transaction."
+        },
+        "createdByUid": {
+          "type": "string",
+          "description": "UID of the administrator who created and processed the invoice."
+        },
+        "createdByEmail": {
+          "type": "string",
+          "description": "Email of the administrator who created the invoice."
+        },
+        "totalItems": {
+          "type": "number",
+          "description": "Count of unique product line items in this invoice."
+        },
+        "totalQuantity": {
+          "type": "number",
+          "description": "Sum of total unit quantities across all line items."
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "Sum total monetary value of this invoice."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Administrative notes or justification for the stock movement."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the transaction was completed."
+        }
+      },
+      "required": ["invoiceNumber", "type", "status", "createdByUid", "totalQuantity", "createdAt"]
+    },
+    "InvoiceItem": {
+      "title": "InvoiceItem",
+      "description": "Itemized line item of an invoice recording exact quantity and stock delta.",
+      "type": "object",
+      "properties": {
+        "invoiceId": {
+          "type": "string",
+          "description": "Parent invoice ID."
+        },
+        "productId": {
+          "type": "string",
+          "description": "Referenced product ID."
+        },
+        "sku": {
+          "type": "string",
+          "description": "SKU at transaction time."
+        },
+        "productName": {
+          "type": "string",
+          "description": "Product name at transaction time."
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Quantity moved."
+        },
+        "unitPrice": {
+          "type": "number",
+          "description": "Unit price at time of transaction."
+        },
+        "subtotal": {
+          "type": "number",
+          "description": "Line total value."
+        },
+        "previousStock": {
+          "type": "number",
+          "description": "Stock count immediately prior to this transaction."
+        },
+        "newStock": {
+          "type": "number",
+          "description": "Stock count immediately after this transaction."
+        }
+      },
+      "required": ["invoiceId", "productId", "sku", "quantity", "previousStock", "newStock"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Immutable system audit trail log entry.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the user executing the action."
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "Email address of the user."
+        },
+        "action": {
+          "type": "string",
+          "description": "Action performed (e.g. INVOICE_CREATED, PRODUCT_CREATED, USER_ROLE_UPDATED)."
+        },
+        "entityType": {
+          "type": "string",
+          "description": "Target entity type (e.g. invoice, product, user)."
+        },
+        "entityId": {
+          "type": "string",
+          "description": "Target entity identifier."
+        },
+        "details": {
+          "type": "string",
+          "description": "Human-readable summary of details."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of action."
+        }
+      },
+      "required": ["userId", "action", "entityType", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and RBAC role assignments."
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Catalog of storage products and current stock balances."
+    },
+    "/invoices/{invoiceId}": {
+      "schema": "Invoice",
+      "description": "Import and export invoice transactional records."
+    },
+    "/invoices/{invoiceId}/items/{itemId}": {
+      "schema": "InvoiceItem",
+      "description": "Individual line items for an invoice transaction."
+    },
+    "/audit_logs/{logId}": {
+      "schema": "AuditLog",
+      "description": "System audit trail entries."
+    }
+  }
+}

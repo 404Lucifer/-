@@ -1,0 +1,6 @@
+{
+  "name": "StockVault - Storage & Inventory Management",
+  "description": "Secure, audit-controlled storage and inventory management system with role-based access control, transaction-enforced stock movements, bulk Excel import, and Google Sheets export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
